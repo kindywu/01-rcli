@@ -1,5 +1,6 @@
 use clap::Parser;
 use rcli::{process_csv, Opts, SubCommand};
+use std::fs;
 
 // cargo run -- csv -i assets/juventus.csv
 // select * from read_csv('assets/juventus.csv', auto_detect=true);
@@ -8,7 +9,8 @@ fn main() -> anyhow::Result<()> {
     // println!("{:?}", opts);
     match opts.cmd {
         SubCommand::Csv(opts) => {
-            process_csv(&opts.input, &opts.output)?;
+            let json = process_csv(&opts.input)?;
+            fs::write(&opts.output, json)?;
         }
     }
     Ok(())

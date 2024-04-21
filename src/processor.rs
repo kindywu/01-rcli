@@ -13,7 +13,7 @@ struct Player {
     kit: String,
 }
 
-pub fn process_csv(input: &str, output: &str) -> Result<(), anyhow::Error> {
+pub fn process_csv(input: &str) -> Result<String, anyhow::Error> {
     let mut reader = Reader::from_path(input)?;
     let mut players = Vec::with_capacity(128);
     for result in reader.deserialize() {
@@ -22,6 +22,6 @@ pub fn process_csv(input: &str, output: &str) -> Result<(), anyhow::Error> {
         players.push(player);
     }
     let json = serde_json::to_string_pretty(&players)?;
-    std::fs::write(output, json)?;
-    Ok(())
+    //
+    Ok(json)
 }
