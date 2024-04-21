@@ -1,5 +1,7 @@
 use clap::Parser;
-use std::path::Path;
+use csv::Reader;
+use serde::{Deserialize, Serialize};
+use std::{fs, path::Path};
 
 // rcli csv -i input.csv -o output.json --header -d ','
 #[derive(Debug, Parser)]
@@ -36,9 +38,36 @@ fn verify_file_is_exist(file_name: &str) -> Result<String, &'static str> {
     }
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+struct Player {
+    name: String,
+    position: String,
+    #[serde(rename = "DOB")]
+    dob: String,
+    nationality: String,
+    #[serde(rename = "Kit Number")]
+    kit: String,
+}
+
 // cargo run -- csv -i assets/juventus.csv
 // select * from read_csv('assets/juventus.csv', auto_detect=true);
-fn main() {
+fn main() -> anyhow::Result<()> {
     let opts = Opts::parse();
-    println!("{:?}", opts);
+    // println!("{:?}", opts);
+    match opts.cmd {
+        SubCommand::Csv(opts) => {
+            let mut reader = Reader::from_path(opts.input)?;
+            let mut players = Vec::with_capacity(128);
+            for result in reader.deserialize() {
+                let player: Player = result?;
+                // println!("{:?}", player);
+                players.push(player);
+            }
+
+            let json = serde_json::to_string_pretty(&players)?;
+            fs::write(opts.output, json)?;
+        }
+    }
+    Ok(())
 }
