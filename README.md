@@ -7,3 +7,10 @@
 - cargo add csv
 - cargo add serde --features derive
 - cargo add serde_json
+
+# Git: checkout -> add -> commit -> push
+
+- git checkout -b $branch_name
+- git add .
+- git commit -m ""
+- git push origin $branch_name
