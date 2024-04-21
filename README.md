@@ -10,7 +10,7 @@
 
 # Git: checkout -> add -> commit -> push
 
-- git checkout -b feature/parse_cli
+- git checkout -b $branch_name
 - git add .
 - git commit -m ""
-- git push origin feature/parse_cli
+- git push origin $branch_name
