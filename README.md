@@ -15,6 +15,6 @@
 - git commit -m ""
 - git push origin $branch_name
 
-- gh pr create -b $branch_name -h "master" -t "New Feature" -b "This is a new feature"
+- gh pr create -b $branch_name -h "main" -t "New Feature" -b "This is a new feature"
 
-gh pr create -B "feature/refactoring_code" -h "master" -t "Feature: Refactoring code" -b "Refactoring code"
+gh pr create -B "feature/refactoring_code" -h "main" -t "Feature: Refactoring code" -b "Refactoring code"
