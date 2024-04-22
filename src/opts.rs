@@ -35,6 +35,7 @@ impl fmt::Display for OutputFormat {
     }
 }
 
+// let name: &str = OutputFormat::Json.into();
 impl From<OutputFormat> for &'static str {
     fn from(value: OutputFormat) -> Self {
         match value {
