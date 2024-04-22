@@ -1,6 +1,6 @@
 use clap::Parser;
 
-use std::{fmt, path::Path};
+use std::{fmt, path::Path, str::FromStr};
 
 // rcli csv -i input.csv -o output.json --header -d ','
 #[derive(Debug, Parser)]
@@ -35,6 +35,44 @@ impl fmt::Display for OutputFormat {
     }
 }
 
+impl From<OutputFormat> for &'static str {
+    fn from(value: OutputFormat) -> Self {
+        match value {
+            OutputFormat::Json => "json",
+            OutputFormat::Yaml => "yaml",
+            OutputFormat::Toml => "toml",
+            OutputFormat::Proto => "proto",
+        }
+    }
+}
+
+impl FromStr for OutputFormat {
+    type Err = &'static str;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "json" => Ok(OutputFormat::Json),
+            "yaml" => Ok(OutputFormat::Yaml),
+            "toml" => Ok(OutputFormat::Toml),
+            "proto" => Ok(OutputFormat::Proto),
+            _ => Err("Invalid format"),
+        }
+    }
+}
+
+// impl TryFrom<&str> for OutputFormat {
+//     type Error = &'static str;
+
+//     fn try_from(value: &str) -> Result<Self, Self::Error> {
+//         match value {
+//             "json" => Ok(OutputFormat::Json),
+//             "yaml" => Ok(OutputFormat::Yaml),
+//             "toml" => Ok(OutputFormat::Toml),
+//             "proto" => Ok(OutputFormat::Proto),
+//             v => Err("Unsupported format"),
+//         }
+//     }
+// }
+
 #[derive(Debug, Parser)]
 pub struct CsvOpts {
     #[arg(short, long, value_parser = verify_file_is_exist)]
@@ -58,11 +96,15 @@ fn verify_file_is_exist(file_name: &str) -> Result<String, &'static str> {
     }
 }
 
+// fn parse_format(format: &str) -> Result<OutputFormat, &'static str> {
+//     match format.to_lowercase().as_str() {
+//         "json" => Ok(OutputFormat::Json),
+//         "yaml" => Ok(OutputFormat::Yaml),
+//         "toml" => Ok(OutputFormat::Toml),
+//         _ => Err("Unsupported format"),
+//     }
+// }
+
 fn parse_format(format: &str) -> Result<OutputFormat, &'static str> {
-    match format.to_lowercase().as_str() {
-        "json" => Ok(OutputFormat::Json),
-        "yaml" => Ok(OutputFormat::Yaml),
-        "toml" => Ok(OutputFormat::Toml),
-        _ => Err("Unsupported format"),
-    }
+    format.parse()
 }
