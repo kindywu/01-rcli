@@ -7,6 +7,7 @@
 - cargo add csv
 - cargo add serde --features derive
 - cargo add serde_json
+- cargo add serde_yaml
 
 # Git: checkout -> add -> commit -> push
 
@@ -17,4 +18,4 @@
 
 - gh pr create -b $branch_name -h "main" -t "New Feature" -b "This is a new feature"
 
-gh pr create -B "feature/refactoring_code" -h "main" -t "Feature: Refactoring code" -b "Refactoring code"
+gh pr create --title "Feature: Support dynamic format" --body "Support dynamic format"

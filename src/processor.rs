@@ -1,5 +1,10 @@
+use std::collections::HashMap;
+
+use anyhow::anyhow;
 use csv::Reader;
 use serde::{Deserialize, Serialize};
+
+use crate::opts::OutputFormat;
 
 #[allow(dead_code)]
 #[derive(Debug, Serialize, Deserialize)]
@@ -14,10 +19,12 @@ struct Player {
     kit: String,
 }
 
-pub fn process_csv(input: &str) -> Result<String, anyhow::Error> {
+pub fn process_csv(input: &str, format: &OutputFormat) -> Result<String, anyhow::Error> {
     let mut reader = Reader::from_path(input)?;
-    let mut records = Vec::with_capacity(128);
+    let mut records: Vec<HashMap<String, String>> = Vec::with_capacity(128);
     let header = reader.headers()?.clone();
+
+    // print!("{:?}", format);
     for result in reader.records() {
         let record = result?;
         // println!("{:?}", record);
@@ -29,12 +36,18 @@ pub fn process_csv(input: &str) -> Result<String, anyhow::Error> {
         // let json_value = serde_json::json!(map);
         // records.push(json_value);
 
-        let json_value = header
+        let value = header
             .iter()
             .zip(record.iter())
-            .collect::<serde_json::Value>();
-        records.push(json_value);
+            .map(|(h, r)| (h.to_owned(), r.to_owned())) // 创建键值对，拥有字符串
+            .collect::<HashMap<String, String>>();
+        records.push(value);
     }
-    let json = serde_json::to_string_pretty(&records)?;
-    Ok(json)
+    let content = match format {
+        OutputFormat::Json => Ok(serde_json::to_string_pretty(&records)?),
+        OutputFormat::Yaml => Ok(serde_yaml::to_string(&records)?),
+        _ => Err(anyhow!("Unsupported format")),
+    }?;
+
+    Ok(content)
 }
