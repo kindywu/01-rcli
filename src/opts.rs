@@ -24,14 +24,20 @@ pub enum OutputFormat {
     Proto,
 }
 
+// impl fmt::Display for OutputFormat {
+//     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+//         match self {
+//             OutputFormat::Json => write!(f, "json"),
+//             OutputFormat::Yaml => write!(f, "yaml"),
+//             OutputFormat::Toml => write!(f, "toml"),
+//             OutputFormat::Proto => write!(f, "proto"),
+//         }
+//     }
+// }
+
 impl fmt::Display for OutputFormat {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            OutputFormat::Json => write!(f, "json"),
-            OutputFormat::Yaml => write!(f, "yaml"),
-            OutputFormat::Toml => write!(f, "toml"),
-            OutputFormat::Proto => write!(f, "proto"),
-        }
+        write!(f, "{}", Into::<&str>::into(*self))
     }
 }
 
