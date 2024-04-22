@@ -9,8 +9,14 @@ fn main() -> anyhow::Result<()> {
     // println!("{:?}", opts);
     match opts.cmd {
         SubCommand::Csv(opts) => {
-            let json = process_csv(&opts.input)?;
-            fs::write(&opts.output, json)?;
+            let json = process_csv(&opts.input, &opts.format)?;
+            let output = if let Some(output) = opts.output {
+                output
+            } else {
+                format!("output.{}", &opts.format)
+            };
+            // println!("{}", output);
+            fs::write(output, json)?;
         }
     }
     Ok(())
