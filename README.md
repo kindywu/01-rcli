@@ -20,3 +20,8 @@
 
 gh pr create --title "Feature: Support dynamic format" --body "Support dynamic format"
 gh pr edit --title "Feature: Support mutli output format"
+
+# Git
+
+- git tag -a v1-8-gen-pass
+- git push origin v1-8-gen-pass
