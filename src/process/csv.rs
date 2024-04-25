@@ -2,22 +2,21 @@ use std::collections::HashMap;
 
 use anyhow::anyhow;
 use csv::Reader;
-use serde::{Deserialize, Serialize};
 
 use crate::opts::OutputFormat;
 
-#[allow(dead_code)]
-#[derive(Debug, Serialize, Deserialize)]
-#[serde(rename_all = "PascalCase")]
-struct Player {
-    name: String,
-    position: String,
-    #[serde(rename = "DOB")]
-    dob: String,
-    nationality: String,
-    #[serde(rename = "Kit Number")]
-    kit: String,
-}
+// #[allow(dead_code)]
+// #[derive(Debug, Serialize, Deserialize)]
+// #[serde(rename_all = "PascalCase")]
+// struct Player {
+//     name: String,
+//     position: String,
+//     #[serde(rename = "DOB")]
+//     dob: String,
+//     nationality: String,
+//     #[serde(rename = "Kit Number")]
+//     kit: String,
+// }
 
 pub fn process_csv(input: &str, format: &OutputFormat) -> Result<String, anyhow::Error> {
     let mut reader = Reader::from_path(input)?;

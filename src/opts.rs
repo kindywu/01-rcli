@@ -12,8 +12,10 @@ pub struct Opts {
 
 #[derive(Debug, Parser)]
 pub enum SubCommand {
-    #[command(name = "csv", about = "Show CSV ,or convert CSV to other formats")]
+    #[command(about = "Show CSV ,or convert CSV to other formats")]
     Csv(CsvOpts),
+    #[command(about = "Generate password")]
+    GenPass(GenPassOpts),
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -22,6 +24,56 @@ pub enum OutputFormat {
     Yaml,
     Toml,
     Proto,
+}
+
+#[derive(Debug, Parser)]
+pub struct CsvOpts {
+    #[arg(short, long, value_parser = verify_file_is_exist)]
+    pub input: String,
+    #[arg(short, long)] //"output.json".into()
+    pub output: Option<String>,
+    #[arg(short, long,  value_parser = parse_format, default_value = "json")]
+    pub format: OutputFormat,
+    #[arg(short, long, default_value_t = ',')]
+    pub delimiter: char,
+    #[arg(long, default_value_t = true)]
+    pub header: bool,
+}
+
+#[derive(Debug, Parser)]
+pub struct GenPassOpts {
+    #[arg(long, default_value_t = 16)]
+    pub length: u8,
+    #[arg(long, default_value_t = false)]
+    pub no_upper_case: bool,
+    #[arg(long, default_value_t = false)]
+    pub no_lower_case: bool,
+    #[arg(long, default_value_t = false)]
+    pub no_number: bool,
+    #[arg(long, default_value_t = false)]
+    pub no_symbol: bool,
+}
+
+// &'static 静态->Data段
+fn verify_file_is_exist(file_name: &str) -> Result<String, &'static str> {
+    if Path::new(file_name).exists() {
+        Ok(file_name.into())
+    } else {
+        Err("File does not exist")
+    }
+}
+
+// fn parse_format(format: &str) -> Result<OutputFormat, &'static str> {
+//     match format.to_lowercase().as_str() {
+//         "json" => Ok(OutputFormat::Json),
+//         "yaml" => Ok(OutputFormat::Yaml),
+//         "toml" => Ok(OutputFormat::Toml),
+//         _ => Err("Unsupported format"),
+//     }
+// }
+
+fn parse_format(format: &str) -> Result<OutputFormat, &'static str> {
+    format.parse()
 }
 
 // impl fmt::Display for OutputFormat {
@@ -79,39 +131,3 @@ impl FromStr for OutputFormat {
 //         }
 //     }
 // }
-
-#[derive(Debug, Parser)]
-pub struct CsvOpts {
-    #[arg(short, long, value_parser = verify_file_is_exist)]
-    pub input: String,
-    #[arg(short, long)] //"output.json".into()
-    pub output: Option<String>,
-    #[arg(short, long,  value_parser = parse_format, default_value = "json")]
-    pub format: OutputFormat,
-    #[arg(short, long, default_value_t = ',')]
-    pub delimiter: char,
-    #[arg(long, default_value_t = true)]
-    pub header: bool,
-}
-
-// &'static 静态->Data段
-fn verify_file_is_exist(file_name: &str) -> Result<String, &'static str> {
-    if Path::new(file_name).exists() {
-        Ok(file_name.into())
-    } else {
-        Err("File does not exist")
-    }
-}
-
-// fn parse_format(format: &str) -> Result<OutputFormat, &'static str> {
-//     match format.to_lowercase().as_str() {
-//         "json" => Ok(OutputFormat::Json),
-//         "yaml" => Ok(OutputFormat::Yaml),
-//         "toml" => Ok(OutputFormat::Toml),
-//         _ => Err("Unsupported format"),
-//     }
-// }
-
-fn parse_format(format: &str) -> Result<OutputFormat, &'static str> {
-    format.parse()
-}

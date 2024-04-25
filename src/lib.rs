@@ -1,5 +1,6 @@
 mod opts;
-mod processor;
+mod process;
 
 pub use opts::{Opts, SubCommand};
-pub use processor::process_csv;
+pub use process::process_csv;
+pub use process::process_gen_pass;
