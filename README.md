@@ -19,7 +19,7 @@
 - gh pr create -b $branch_name -h "main" -t "New Feature" -b "This is a new feature"
 
 gh pr create --title "Feature: Support dynamic format" --body "Support dynamic format"
-gh pr edit --title "Feature: Support mutli output format"
+gh pr edit --title "Feature: Support multi output format"
 
 # Git
 

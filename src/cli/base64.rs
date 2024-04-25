@@ -1,3 +1,4 @@
+use std::fmt;
 use std::str::FromStr;
 
 use clap::Parser;
@@ -47,5 +48,21 @@ impl FromStr for Base64Format {
             "urlsafe" => Ok(Base64Format::UrlSafe),
             _ => Err(anyhow::anyhow!("Invalid format")),
         }
+    }
+}
+
+// let name: &str = OutputFormat::Json.into();
+impl From<Base64Format> for &'static str {
+    fn from(value: Base64Format) -> Self {
+        match value {
+            Base64Format::Standard => "standard",
+            Base64Format::UrlSafe => "urlsafe",
+        }
+    }
+}
+
+impl fmt::Display for Base64Format {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", Into::<&str>::into(*self))
     }
 }

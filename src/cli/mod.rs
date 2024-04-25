@@ -28,10 +28,20 @@ pub enum SubCommand {
 
 // &'static 静态->Data段
 fn verify_file(file_name: &str) -> Result<String, &'static str> {
-    assert!(!file_name.is_empty(), "file name can't be empty");
     if file_name == "-" || Path::new(file_name).exists() {
         Ok(file_name.into())
     } else {
         Err("File does not exist")
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::cli::verify_file;
+    #[test]
+    fn test_verify_file() {
+        assert_eq!(verify_file("-"), Ok("-".to_string()));
+        assert_eq!(verify_file("Cargo.toml"), Ok("Cargo.toml".into()));
+        assert_eq!(verify_file("not-exist"), Err("File does not exist"));
     }
 }

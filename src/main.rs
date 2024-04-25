@@ -1,5 +1,8 @@
 use clap::Parser;
-use rcli::{process_csv, process_gen_pass, Base64SubCommand, Opts, SubCommand};
+use rcli::{
+    process_base64_decode, process_base64_encode, process_csv, process_gen_pass, Base64SubCommand,
+    Opts, SubCommand,
+};
 use std::fs;
 use zxcvbn::zxcvbn;
 
@@ -33,10 +36,14 @@ fn main() -> anyhow::Result<()> {
         }
         SubCommand::Base64(subcmd) => match subcmd {
             Base64SubCommand::Encode(opts) => {
-                println!("{:?}", opts)
+                eprintln!("encode {:?}", opts);
+                let encode = process_base64_encode(&opts.input, opts.format)?;
+                println!("{}", encode);
             }
             Base64SubCommand::Decode(opts) => {
-                println!("{:?}", opts)
+                eprintln!("decode {:?}", opts);
+                let decode = process_base64_decode(&opts.input, opts.format)?;
+                println!("{}", decode)
             }
         },
     }
