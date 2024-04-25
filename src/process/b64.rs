@@ -35,7 +35,7 @@ fn read_content(input: &str) -> anyhow::Result<String> {
 
     let mut buffer = Vec::new();
     reader.read_to_end(&mut buffer)?;
-    Ok(String::from_utf8(buffer)?.trim().to_owned())
+    Ok(String::from_utf8_lossy(&buffer).trim().to_owned())
 }
 
 #[cfg(test)]
