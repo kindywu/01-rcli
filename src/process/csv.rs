@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use anyhow::anyhow;
 use csv::Reader;
 
-use crate::opts::OutputFormat;
+use crate::cli::OutputFormat;
 
 // #[allow(dead_code)]
 // #[derive(Debug, Serialize, Deserialize)]
