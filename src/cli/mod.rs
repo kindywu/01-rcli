@@ -1,13 +1,15 @@
 mod base64;
 mod cvs;
 mod gen_pass;
+mod text;
 
+use clap::Parser;
 use std::path::Path;
 
 pub use base64::*;
-use clap::Parser;
 pub use cvs::*;
 pub use gen_pass::*;
+pub use text::*;
 
 #[derive(Debug, Parser)]
 #[command(name ="rcli",version,author,about,long_about=None)]
@@ -24,6 +26,8 @@ pub enum SubCommand {
     GenPass(GenPassOpts),
     #[command(subcommand, about = "Encode and Decode base64")]
     Base64(Base64SubCommand),
+    #[command(subcommand, about = "Encrypt and Decrypt text")]
+    Text(TextSubCommand),
 }
 
 // &'static 静态->Data段

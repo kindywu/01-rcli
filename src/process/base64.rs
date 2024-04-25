@@ -1,11 +1,9 @@
-use std::io::Read;
-
 use base64::engine::general_purpose::URL_SAFE;
 use base64::prelude::*;
 
 use crate::cli::Base64Format;
-use std::fs::File;
-use std::io::stdin;
+
+use super::read_content;
 
 pub fn process_base64_encode(input: &str, format: Base64Format) -> anyhow::Result<String> {
     let data = read_content(input)?;
@@ -25,19 +23,9 @@ pub fn process_base64_decode(input: &str, format: Base64Format) -> anyhow::Resul
     }
 }
 
-// windows: use ctrl+z to finish stdin input
-fn read_content(input: &str) -> anyhow::Result<String> {
-    let mut reader: Box<dyn Read> = if input == "-" {
-        Box::new(stdin())
-    } else {
-        Box::new(File::open(input)?)
-    };
-
-    let mut buffer = Vec::new();
-    reader.read_to_end(&mut buffer)?;
-    Ok(String::from_utf8_lossy(&buffer).trim().to_owned())
-}
-
+// window: make sure your powershell's $PSVersionTable.PSVersion > 7
+// cargo run base64 encode --input fixtures/b64_plain.txt | Out-File -FilePath "fixtures/b64.txt" -Encoding UTF8 -NoNewline
+// cargo run base64 decode --input fixtures/b64.txt
 #[cfg(test)]
 mod tests {
     use crate::cli::Base64Format;
@@ -55,10 +43,6 @@ mod tests {
         );
         Ok(())
     }
-
-    // window: make sure your powershell's $PSVersionTable.PSVersion > 7
-    // cargo run base64 encode --input fixtures/b64_plain.txt | Out-File -FilePath "fixtures/b64.txt" -Encoding UTF8 -NoNewline
-    // cargo run base64 decode --input fixtures/b64.txt
     #[test]
     fn test_process_base64_decode() -> anyhow::Result<()> {
         let plain = std::fs::read_to_string(PLAIN_FILE)?;
