@@ -1,8 +1,8 @@
 use clap::Parser;
 use rcli::{
     process_base64_decode, process_base64_encode, process_csv, process_gen_pass,
-    process_text_decrypt, process_text_encrypt, read_content, Base64SubCommand, Opts, SubCommand,
-    TextSubCommand,
+    process_text_decrypt, process_text_encrypt, process_text_sign, process_text_verify,
+    read_content, Base64SubCommand, Opts, SubCommand, TextSubCommand,
 };
 use std::fs;
 use zxcvbn::zxcvbn;
@@ -38,12 +38,14 @@ fn main() -> anyhow::Result<()> {
         SubCommand::Base64(subcmd) => match subcmd {
             Base64SubCommand::Encode(opts) => {
                 eprintln!("encode {:?}", opts);
-                let encode = process_base64_encode(&opts.input, opts.format)?;
+                let data = read_content(&opts.input)?;
+                let encode = process_base64_encode(data.as_str(), opts.format)?;
                 println!("{}", encode);
             }
             Base64SubCommand::Decode(opts) => {
                 eprintln!("decode {:?}", opts);
-                let decode = process_base64_decode(&opts.input, opts.format)?;
+                let data = read_content(&opts.input)?;
+                let decode = process_base64_decode(&data, opts.format)?;
                 println!("{}", decode)
             }
         },
@@ -69,6 +71,28 @@ fn main() -> anyhow::Result<()> {
                 let plain_text =
                     process_text_decrypt(cipher_text.trim(), &opts.key_base64, &opts.nonce_base64)?;
                 println!("plain_text is {}", plain_text)
+            }
+            TextSubCommand::Sign(opts) => {
+                eprintln!("sign {:?}", opts);
+                let data = read_content(&opts.input)?;
+                let key = read_content(&opts.key)?;
+
+                // println!("plain_text is {}", plain_text);
+                let signed = process_text_sign(data.as_str(), key.as_str(), opts.format)?;
+                println!("{}", signed);
+            }
+            TextSubCommand::Verify(opts) => {
+                eprintln!("verify {:?}", opts);
+                let data = read_content(&opts.input)?;
+                let key = read_content(&opts.key)?;
+                let signed = read_content(&opts.signed)?;
+                eprintln!("verify {:?}", opts);
+                let verify =
+                    process_text_verify(data.as_str(), key.as_str(), signed.as_str(), opts.format)?;
+                println!("{}", verify);
+            }
+            TextSubCommand::GenerateKey(opts) => {
+                eprintln!("generate key {:?}", opts);
             }
         },
     }
