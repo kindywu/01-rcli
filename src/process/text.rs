@@ -1,41 +1,12 @@
-use anyhow::anyhow;
-use base64::prelude::*;
-use chacha20poly1305::{
-    aead::{Aead, AeadCore, Key, KeyInit, Nonce, OsRng},
-    XChaCha20Poly1305,
-};
-use ed25519_dalek::Signature;
-use ed25519_dalek::Signer;
-use ed25519_dalek::SigningKey;
-use ed25519_dalek::Verifier;
-use ed25519_dalek::VerifyingKey;
-use ed25519_dalek::SIGNATURE_LENGTH;
-
 use crate::cli::TextSignFormat;
 
-pub struct EncryptResult {
-    pub key_base64: String,
-    pub nonce_base64: String,
-    pub ciphertext_base64: String,
-}
+use super::{
+    encrypt_decrypt::{self, *},
+    signer_verifier::*,
+};
 
 pub fn process_text_encrypt(plain_text: &str) -> anyhow::Result<EncryptResult> {
-    let key = XChaCha20Poly1305::generate_key(&mut OsRng);
-    let nonce = XChaCha20Poly1305::generate_nonce(&mut OsRng);
-    let cipher = XChaCha20Poly1305::new(&key);
-    let ciphertext = cipher
-        .encrypt(&nonce, plain_text.as_ref())
-        .map_err(|e| anyhow!(format!("{}", e)))?;
-
-    let key_base64 = BASE64_STANDARD.encode(key);
-    let nonce_base64 = BASE64_STANDARD.encode(nonce);
-    let ciphertext_base64 = BASE64_STANDARD.encode(ciphertext);
-
-    Ok(EncryptResult {
-        key_base64,
-        nonce_base64,
-        ciphertext_base64,
-    })
+    encrypt_decrypt::ChaCha20Poly1305::encrypt(plain_text)
 }
 
 pub fn process_text_decrypt(
@@ -43,41 +14,15 @@ pub fn process_text_decrypt(
     key_base64: &str,
     nonce_base64: &str,
 ) -> anyhow::Result<String> {
-    let ciphertext_bytes = BASE64_STANDARD.decode(cipher_text)?;
-    let key_bytes = BASE64_STANDARD.decode(key_base64)?;
-    let nonce_bytes = BASE64_STANDARD.decode(nonce_base64)?;
-
-    // let mut nonce = XChaCha20Poly1305::generate_nonce(&mut OsRng);
-    // nonce.clone_from_slice(&nonce_bytes);
-
-    // let nonce = GenericArray::<u8, <XChaCha20Poly1305 as AeadCore>::NonceSize>::clone_from_slice(
-    //     &nonce_bytes,
-    // );
-
-    let nonce = Nonce::<XChaCha20Poly1305>::from_slice(&nonce_bytes);
-    let key = Key::<XChaCha20Poly1305>::from_slice(&key_bytes);
-
-    let cipher = XChaCha20Poly1305::new(key);
-    // let cipher =
-    //     XChaCha20Poly1305::new_from_slice(&key_bytes).map_err(|e| anyhow!(format!("{}", e)))?;
-
-    let plaintext = cipher
-        .decrypt(nonce, ciphertext_bytes.as_ref())
-        .map_err(|e| anyhow!(format!("{}", e)))?;
-    Ok(String::from_utf8(plaintext)?)
+    encrypt_decrypt::ChaCha20Poly1305::decrypt(cipher_text, key_base64, nonce_base64)
 }
 
 pub fn process_text_sign(data: &str, key: &str, format: TextSignFormat) -> anyhow::Result<String> {
-    let key = key.as_bytes()[..32].try_into()?;
-    let signed = match format {
-        TextSignFormat::Blake3 => blake3::keyed_hash(&key, data.as_bytes()).to_string(),
-        TextSignFormat::Ed25519 => {
-            let signing_key = SigningKey::from_bytes(&key);
-            let signature = signing_key.sign(data.as_bytes());
-            let signature_bytes: [u8; SIGNATURE_LENGTH] = signature.to_bytes();
-            BASE64_STANDARD.encode(signature_bytes)
-        }
+    let signer: Box<dyn TextSigner> = match format {
+        TextSignFormat::Blake3 => Box::new(Blake3::try_new(key)?),
+        TextSignFormat::Ed25519 => Box::new(Ed25519::try_new(key)?),
     };
+    let signed = signer.sign(data)?;
     Ok(signed)
 }
 
@@ -87,17 +32,11 @@ pub fn process_text_verify(
     signed: &str,
     format: TextSignFormat,
 ) -> anyhow::Result<bool> {
-    let key = key.as_bytes()[..32].try_into()?;
-    let verify = match format {
-        TextSignFormat::Blake3 => blake3::keyed_hash(&key, data.as_bytes()).to_string() == signed,
-        TextSignFormat::Ed25519 => {
-            let signature_bytes = BASE64_STANDARD.decode(signed)?;
-            let signature: Signature = Signature::try_from(&signature_bytes[..])?;
-            let signing_key = SigningKey::from_bytes(&key);
-            let verifying_key: VerifyingKey = signing_key.verifying_key();
-            verifying_key.verify(data.as_bytes(), &signature).is_ok()
-        }
+    let verifier: Box<dyn TextVerifier> = match format {
+        TextSignFormat::Blake3 => Box::new(Blake3::try_new(key)?),
+        TextSignFormat::Ed25519 => Box::new(Ed25519::try_new(key)?),
     };
+    let verify = verifier.verify(data, signed)?;
     Ok(verify)
 }
 

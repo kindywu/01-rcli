@@ -1,7 +1,9 @@
 // mod 引用
 mod base64;
 mod csv;
+mod encrypt_decrypt;
 mod gen_pass;
+mod signer_verifier;
 mod text;
 
 // pub use 导出
