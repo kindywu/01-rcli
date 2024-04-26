@@ -40,6 +40,12 @@ pub fn process_text_verify(
     Ok(verify)
 }
 
+pub fn process_text_generate_key(format: TextSignFormat) -> anyhow::Result<Vec<String>> {
+    match format {
+        TextSignFormat::Blake3 => Blake3::generate_key(),
+        TextSignFormat::Ed25519 => Ed25519::generate_key(),
+    }
+}
 // cargo run gen-pass | Out-File -FilePath "fixtures/blake3.txt" -Encoding UTF8 -NoNewline
 
 // window: make sure your powershell's $PSVersionTable.PSVersion > 7

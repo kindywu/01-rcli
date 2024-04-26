@@ -5,6 +5,12 @@ use ed25519_dalek::SigningKey;
 use ed25519_dalek::Verifier;
 use ed25519_dalek::VerifyingKey;
 use ed25519_dalek::SIGNATURE_LENGTH;
+use rand::rngs::OsRng;
+
+use super::gen_pass;
+pub trait KeyGenerator {
+    fn generate_key() -> anyhow::Result<Vec<String>>;
+}
 
 pub trait TextSigner {
     fn sign(&self, data: &str) -> anyhow::Result<String>;
@@ -42,6 +48,14 @@ impl TextVerifier for Blake3 {
     }
 }
 
+impl KeyGenerator for Blake3 {
+    fn generate_key() -> anyhow::Result<Vec<String>> {
+        let key = gen_pass::process_gen_pass(32, false, false, false, false)?;
+        let keys = vec![key];
+        Ok(keys)
+    }
+}
+
 pub struct Ed25519 {
     key: SigningKey,
 }
@@ -74,5 +88,18 @@ impl TextVerifier for Ed25519 {
         let signature: Signature = Signature::try_from(&signature_bytes[..])?;
         let verifying_key: VerifyingKey = self.key.verifying_key();
         Ok(verifying_key.verify(data.as_bytes(), &signature).is_ok())
+    }
+}
+
+impl KeyGenerator for Ed25519 {
+    fn generate_key() -> anyhow::Result<Vec<String>> {
+        let mut csprng = OsRng;
+        let signing_key: SigningKey = SigningKey::generate(&mut csprng);
+        let verifying_key: VerifyingKey = signing_key.verifying_key();
+        let keys = vec![
+            BASE64_STANDARD.encode(signing_key.to_bytes()),
+            BASE64_STANDARD.encode(verifying_key.to_bytes()),
+        ];
+        Ok(keys)
     }
 }

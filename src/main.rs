@@ -1,10 +1,12 @@
+use std::fs;
+
 use clap::Parser;
 use rcli::{
     process_base64_decode, process_base64_encode, process_csv, process_gen_pass,
-    process_text_decrypt, process_text_encrypt, process_text_sign, process_text_verify,
-    read_content, Base64SubCommand, Opts, SubCommand, TextSubCommand,
+    process_text_decrypt, process_text_encrypt, process_text_generate_key, process_text_sign,
+    process_text_verify, read_content, Base64SubCommand, Opts, SubCommand, TextSignFormat,
+    TextSubCommand,
 };
-use std::fs;
 use zxcvbn::zxcvbn;
 
 // cargo run -- csv -i assets/juventus.csv
@@ -93,6 +95,28 @@ fn main() -> anyhow::Result<()> {
             }
             TextSubCommand::GenerateKey(opts) => {
                 eprintln!("generate key {:?}", opts);
+                let keys = process_text_generate_key(opts.format)?;
+                match opts.format {
+                    TextSignFormat::Blake3 => {
+                        let content = keys
+                            .first()
+                            .ok_or(anyhow::anyhow!("key is empty"))?
+                            .as_bytes();
+                        std::fs::write(opts.path.join("blake.txt"), content)?
+                    }
+                    TextSignFormat::Ed25519 => {
+                        let content = keys
+                            .first()
+                            .ok_or(anyhow::anyhow!("secret key is empty"))?
+                            .as_bytes();
+                        std::fs::write(opts.path.join("ed25519.sk"), content)?;
+                        let content = keys
+                            .get(1)
+                            .ok_or(anyhow::anyhow!("public key is empty"))?
+                            .as_bytes();
+                        std::fs::write(opts.path.join("ed25519.pk"), content)?
+                    }
+                }
             }
         },
     }

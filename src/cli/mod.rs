@@ -4,7 +4,7 @@ mod gen_pass;
 mod text;
 
 use clap::Parser;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 pub use base64::*;
 pub use cvs::*;
@@ -36,6 +36,15 @@ fn verify_file(file_name: &str) -> Result<String, &'static str> {
         Ok(file_name.into())
     } else {
         Err("File does not exist")
+    }
+}
+
+fn verify_path(path_name: &str) -> Result<PathBuf, &'static str> {
+    let path = Path::new(path_name);
+    if path.exists() && path.is_dir() {
+        Ok(path_name.into())
+    } else {
+        Err("Path does not exist")
     }
 }
 

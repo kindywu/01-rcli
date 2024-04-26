@@ -1,8 +1,8 @@
-use std::{fmt, str::FromStr};
+use std::{fmt, path::PathBuf, str::FromStr};
 
 use clap::{command, Parser};
 
-use super::verify_file;
+use super::{verify_file, verify_path};
 #[derive(Debug, Parser)]
 pub enum TextSubCommand {
     #[command(about = "encode input to base64")]
@@ -14,7 +14,7 @@ pub enum TextSubCommand {
     Sign(SignOpts),
     #[command(about = "verify a signed message")]
     Verify(VerifytOpts),
-    #[command(about = "Generate a key pair")]
+    #[command(about = "Generate a new key pair")]
     GenerateKey(GenerateKeytOpts),
 }
 #[derive(Debug, Parser)]
@@ -71,7 +71,13 @@ pub struct VerifytOpts {
 }
 
 #[derive(Debug, Parser)]
-pub struct GenerateKeytOpts {}
+pub struct GenerateKeytOpts {
+    #[arg(short, long, value_parser = parse_format, default_value = "blake3")]
+    pub format: TextSignFormat,
+
+    #[arg(short,long,value_parser=verify_path, default_value="fixtures")]
+    pub path: PathBuf,
+}
 
 fn parse_format(format: &str) -> Result<TextSignFormat, anyhow::Error> {
     format.parse()
