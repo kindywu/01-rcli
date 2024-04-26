@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use base64::prelude::*;
 use chacha20poly1305::{
-    aead::{Aead, AeadCore, KeyInit, OsRng},
+    aead::{generic_array::GenericArray, Aead, AeadCore, KeyInit, OsRng},
     XChaCha20Poly1305,
 };
 
@@ -39,8 +39,12 @@ pub fn process_text_decrypt(
     let key_bytes = BASE64_STANDARD.decode(key_base64)?;
     let nonce_bytes = BASE64_STANDARD.decode(nonce_base64)?;
 
-    let mut nonce = XChaCha20Poly1305::generate_nonce(&mut OsRng);
-    nonce.clone_from_slice(&nonce_bytes);
+    // let mut nonce = XChaCha20Poly1305::generate_nonce(&mut OsRng);
+    // nonce.clone_from_slice(&nonce_bytes);
+
+    let nonce = GenericArray::<u8, <XChaCha20Poly1305 as AeadCore>::NonceSize>::clone_from_slice(
+        &nonce_bytes,
+    );
 
     // let new_key = XChaCha20Poly1305::k::from(key_bytes);
     let cipher =
