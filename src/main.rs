@@ -94,7 +94,7 @@ fn main() -> anyhow::Result<()> {
                 println!("{}", verify);
             }
             TextSubCommand::GenerateKey(opts) => {
-                eprintln!("generate key {:?}", opts);
+                // eprintln!("generate key {:?}", opts);
                 let keys = process_text_generate_key(opts.format)?;
                 match opts.format {
                     TextSignFormat::Blake3 => {
@@ -102,6 +102,7 @@ fn main() -> anyhow::Result<()> {
                             .first()
                             .ok_or(anyhow::anyhow!("key is empty"))?
                             .as_bytes();
+                        println!("{:?}", content);
                         std::fs::write(opts.path.join("blake.txt"), content)?
                     }
                     TextSignFormat::Ed25519 => {
@@ -109,11 +110,15 @@ fn main() -> anyhow::Result<()> {
                             .first()
                             .ok_or(anyhow::anyhow!("secret key is empty"))?
                             .as_bytes();
+                        println!("{:?}", content);
+
                         std::fs::write(opts.path.join("ed25519.sk"), content)?;
                         let content = keys
                             .get(1)
                             .ok_or(anyhow::anyhow!("public key is empty"))?
                             .as_bytes();
+                        println!("{:?}", content);
+
                         std::fs::write(opts.path.join("ed25519.pk"), content)?
                     }
                 }

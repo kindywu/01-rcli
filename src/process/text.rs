@@ -58,6 +58,12 @@ pub fn process_text_generate_key(format: TextSignFormat) -> anyhow::Result<Vec<S
 // cargo run text sign -i fixtures\ed25519_plain.txt -k fixtures\ed25519.txt -f ed25519
 // cargo run text verify -i fixtures\ed25519_plain.txt -k fixtures\ed25519.txt -f ed25519
 
+// cargo run text sign -i fixtures\blake3_plain.txt -k fixtures\blake.txt
+// cargo run text verify -i fixtures\blake3_plain.txt -k fixtures\blake.txt
+
+// cargo run text sign -i fixtures\ed25519_plain.txt -k fixtures\ed25519.sk -f ed25519
+// cargo run text verify -i fixtures\ed25519_plain.txt -k fixtures\ed25519.sk -f ed25519
+
 #[cfg(test)]
 mod tests {
 
