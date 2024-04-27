@@ -1,6 +1,7 @@
 mod base64;
 mod cvs;
 mod gen_pass;
+mod jwt;
 mod text;
 
 use clap::Parser;
@@ -9,6 +10,7 @@ use std::path::{Path, PathBuf};
 pub use base64::*;
 pub use cvs::*;
 pub use gen_pass::*;
+pub use jwt::*;
 pub use text::*;
 
 #[derive(Debug, Parser)]
@@ -28,6 +30,8 @@ pub enum SubCommand {
     Base64(Base64SubCommand),
     #[command(subcommand, about = "Encrypt and Decrypt text")]
     Text(TextSubCommand),
+    #[command(subcommand, about = "Sign and Verify text use JWT")]
+    Jwt(JwtSubCommand),
 }
 
 // &'static 静态->Data段

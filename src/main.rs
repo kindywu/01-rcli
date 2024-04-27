@@ -2,10 +2,10 @@ use std::fs;
 
 use clap::Parser;
 use rcli::{
-    process_base64_decode, process_base64_encode, process_csv, process_gen_pass,
-    process_text_decrypt, process_text_encrypt, process_text_generate_key, process_text_sign,
-    process_text_verify, read_content, Base64SubCommand, Opts, SubCommand, TextSignFormat,
-    TextSubCommand,
+    process_base64_decode, process_base64_encode, process_csv, process_gen_pass, process_jwt_sign,
+    process_jwt_verify, process_text_decrypt, process_text_encrypt, process_text_generate_key,
+    process_text_sign, process_text_verify, read_content, Base64SubCommand, JwtSubCommand, Opts,
+    SubCommand, TextSignFormat, TextSubCommand,
 };
 use zxcvbn::zxcvbn;
 
@@ -122,6 +122,22 @@ fn main() -> anyhow::Result<()> {
                         std::fs::write(opts.path.join("ed25519.pk"), content)?
                     }
                 }
+            }
+        },
+        SubCommand::Jwt(subcmd) => match subcmd {
+            JwtSubCommand::Sign(opts) => {
+                eprintln!("sign {:?}", opts);
+                let data = read_content(&opts.input)?;
+                // println!("plain_text is {}", data);
+                let signed =
+                    process_jwt_sign(opts.algorithm, opts.key, opts.aud, opts.sub, opts.exp, data)?;
+                println!("{}", signed);
+            }
+            JwtSubCommand::Verify(opts) => {
+                eprintln!("verify {:?}", opts);
+                let signed = read_content(&opts.input)?;
+                let claims = process_jwt_verify(opts.algorithm, opts.key, signed);
+                println!("{:?}", claims);
             }
         },
     }
