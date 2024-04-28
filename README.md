@@ -23,5 +23,5 @@ gh pr edit --title "Feature: Support multi output format"
 
 # Git
 
-- git tag -a v1-11-jwt
-- git push origin v1-11-jwt
+- git tag -a v1-12-http-serve
+- git push origin v1-12-http-serve

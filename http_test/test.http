@@ -7,3 +7,9 @@ GET http://127.0.0.1:8080/b64.txt
 
 ### Get abc.txt
 GET http://127.0.0.1:8080/abc.txt
+
+### Get sub_dir/Cargo.toml through tower
+http://localhost:8080/tower/sub_dir/Cargo.toml
+# Range: bytes=0-100
+Range: bytes=101-
+Accept-Encoding: gzip
