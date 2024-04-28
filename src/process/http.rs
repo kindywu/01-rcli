@@ -94,6 +94,10 @@ async fn read_dir_content(
     Ok(list)
 }
 
+// http://localhost:8080/
+// http://localhost:8080/b64.txt
+// http://localhost:8080/sub_dir
+
 #[cfg(test)]
 mod tests {
     use super::*;
