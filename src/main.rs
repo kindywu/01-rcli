@@ -2,16 +2,22 @@ use std::fs;
 
 use clap::Parser;
 use rcli::{
-    process_base64_decode, process_base64_encode, process_csv, process_gen_pass, process_jwt_sign,
-    process_jwt_verify, process_text_decrypt, process_text_encrypt, process_text_generate_key,
-    process_text_sign, process_text_verify, read_content, Base64SubCommand, JwtSubCommand, Opts,
-    SubCommand, TextSignFormat, TextSubCommand,
+    process_base64_decode, process_base64_encode, process_csv, process_gen_pass,
+    process_http_serve, process_jwt_sign, process_jwt_verify, process_text_decrypt,
+    process_text_encrypt, process_text_generate_key, process_text_sign, process_text_verify,
+    read_content, Base64SubCommand, HttpSubCommand, JwtSubCommand, Opts, SubCommand,
+    TextSignFormat, TextSubCommand,
 };
+use tracing::Level;
 use zxcvbn::zxcvbn;
 
 // cargo run -- csv -i assets/juventus.csv
 // select * from read_csv('assets/juventus.csv', auto_detect=true);
-fn main() -> anyhow::Result<()> {
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
+    // tracing_subscriber::fmt::init();
+    tracing_subscriber::fmt().with_max_level(Level::INFO).init();
+
     let opts = Opts::parse();
     // println!("{:?}", opts);
     match opts.cmd {
@@ -138,6 +144,12 @@ fn main() -> anyhow::Result<()> {
                 let signed = read_content(&opts.input)?;
                 let claims = process_jwt_verify(opts.algorithm, opts.key, signed);
                 println!("{:?}", claims);
+            }
+        },
+        SubCommand::Http(subcmd) => match subcmd {
+            HttpSubCommand::Serve(opts) => {
+                // eprintln!("serve {:?}", opts);
+                process_http_serve(opts.path, opts.port).await?
             }
         },
     }

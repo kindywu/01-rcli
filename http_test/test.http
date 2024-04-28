@@ -1,0 +1,9 @@
+### Get Index Page
+GET http://127.0.0.1:8080/
+
+### Get b64.txt
+GET http://127.0.0.1:8080/b64.txt
+
+
+### Get abc.txt
+GET http://127.0.0.1:8080/abc.txt

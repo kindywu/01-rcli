@@ -1,6 +1,7 @@
 mod base64;
 mod cvs;
 mod gen_pass;
+mod http;
 mod jwt;
 mod text;
 
@@ -10,6 +11,7 @@ use std::path::{Path, PathBuf};
 pub use base64::*;
 pub use cvs::*;
 pub use gen_pass::*;
+pub use http::*;
 pub use jwt::*;
 pub use text::*;
 
@@ -32,6 +34,8 @@ pub enum SubCommand {
     Text(TextSubCommand),
     #[command(subcommand, about = "Sign and Verify text use JWT")]
     Jwt(JwtSubCommand),
+    #[command(subcommand, about = "Sign and Verify text use JWT")]
+    Http(HttpSubCommand),
 }
 
 // &'static 静态->Data段
