@@ -6,6 +6,7 @@ mod jwt;
 mod text;
 
 use clap::Parser;
+use enum_dispatch::enum_dispatch;
 use std::path::{Path, PathBuf};
 
 pub use base64::*;
@@ -23,6 +24,7 @@ pub struct Opts {
 }
 
 #[derive(Debug, Parser)]
+#[enum_dispatch(CmdExector)]
 pub enum SubCommand {
     #[command(about = "Show CSV ,or convert CSV to other formats")]
     Csv(CsvOpts),

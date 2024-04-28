@@ -50,3 +50,6 @@ pub fn process_csv(input: &str, format: &OutputFormat) -> Result<String, anyhow:
 
     Ok(content)
 }
+
+// duckdb
+// select * from read_csv('assets/juventus.csv', auto_detect=true);

@@ -2,15 +2,14 @@ mod cli;
 mod process;
 mod util;
 
-pub use cli::{
-    Base64SubCommand, HttpSubCommand, JwtSubCommand, Opts, SubCommand, TextSignFormat,
-    TextSubCommand,
-};
-pub use process::process_csv;
-pub use process::process_gen_pass;
-pub use process::process_http_serve;
-pub use process::{process_base64_decode, process_base64_encode};
-pub use process::{process_jwt_sign, process_jwt_verify};
-pub use process::{process_text_decrypt, process_text_encrypt};
-pub use process::{process_text_generate_key, process_text_sign, process_text_verify};
+use enum_dispatch::enum_dispatch;
+
+pub use cli::*;
+pub use process::*;
 pub use util::read_content;
+
+#[allow(async_fn_in_trait)]
+#[enum_dispatch]
+pub trait CmdExector {
+    async fn execute(self) -> anyhow::Result<()>;
+}
