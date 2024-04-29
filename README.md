@@ -15,6 +15,7 @@
 - git add .
 - git commit -m ""
 - git push origin $branch_name
+- git commit -a --amend
 
 - gh pr create -b $branch_name -h "main" -t "New Feature" -b "This is a new feature"
 
