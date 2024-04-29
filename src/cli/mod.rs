@@ -16,6 +16,8 @@ pub use http::*;
 pub use jwt::*;
 pub use text::*;
 
+use crate::CmdExector;
+
 #[derive(Debug, Parser)]
 #[command(name ="rcli",version,author,about,long_about=None)]
 pub struct Opts {
@@ -55,6 +57,19 @@ fn verify_path(path_name: &str) -> Result<PathBuf, &'static str> {
         Ok(path_name.into())
     } else {
         Err("Path does not exist")
+    }
+}
+
+impl CmdExector for SubCommand {
+    async fn execute(self) -> anyhow::Result<()> {
+        match self {
+            SubCommand::Csv(opts) => opts.execute().await,
+            SubCommand::GenPass(opts) => opts.execute().await,
+            SubCommand::Base64(sub) => sub.execute().await,
+            SubCommand::Text(sub) => sub.execute().await,
+            SubCommand::Jwt(sub) => sub.execute().await,
+            SubCommand::Http(sub) => sub.execute().await,
+        }
     }
 }
 

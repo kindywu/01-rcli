@@ -1,7 +1,7 @@
 use chrono::Local;
 use clap::Parser;
 use duration_str::parse;
-use enum_dispatch::enum_dispatch;
+// use enum_dispatch::enum_dispatch;
 use jsonwebtoken::Algorithm;
 use std::ops::Add;
 
@@ -10,7 +10,7 @@ use crate::{process_jwt_sign, process_jwt_verify, read_content, CmdExector};
 use super::verify_file;
 
 #[derive(Debug, Parser)]
-#[enum_dispatch(CmdExector)]
+// #[enum_dispatch(CmdExector)]
 pub enum JwtSubCommand {
     #[command(about = "sign a message with a private/public key")]
     Sign(JwtSignOpts),
@@ -78,4 +78,13 @@ fn expiration_timestamp(exp: String) -> i64 {
     let now = Local::now();
     let tomorrow = now.add(duration);
     tomorrow.timestamp()
+}
+
+impl CmdExector for JwtSubCommand {
+    async fn execute(self) -> anyhow::Result<()> {
+        match self {
+            JwtSubCommand::Sign(opts) => opts.execute().await,
+            JwtSubCommand::Verify(opts) => opts.execute().await,
+        }
+    }
 }

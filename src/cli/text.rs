@@ -1,7 +1,7 @@
 use std::{fmt, path::PathBuf, str::FromStr};
 
 use clap::{command, Parser};
-use enum_dispatch::enum_dispatch;
+// use enum_dispatch::enum_dispatch;
 
 use crate::{
     process_text_decrypt, process_text_encrypt, process_text_generate_key, process_text_sign,
@@ -10,7 +10,7 @@ use crate::{
 
 use super::{verify_file, verify_path};
 #[derive(Debug, Parser)]
-#[enum_dispatch(CmdExector)]
+// #[enum_dispatch(CmdExector)]
 pub enum TextSubCommand {
     #[command(about = "encode input to base64")]
     Encrypt(EncryptOpts),
@@ -200,5 +200,17 @@ impl CmdExector for GenerateKeytOpts {
             }
         };
         Ok(())
+    }
+}
+
+impl CmdExector for TextSubCommand {
+    async fn execute(self) -> anyhow::Result<()> {
+        match self {
+            TextSubCommand::Encrypt(opts) => opts.execute().await,
+            TextSubCommand::Decrypt(opts) => opts.execute().await,
+            TextSubCommand::Sign(opts) => opts.execute().await,
+            TextSubCommand::Verify(opts) => opts.execute().await,
+            TextSubCommand::GenerateKey(opts) => opts.execute().await,
+        }
     }
 }
