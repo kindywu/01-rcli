@@ -7,6 +7,7 @@ use tracing::Level;
 async fn main() -> anyhow::Result<()> {
     // tracing_subscriber::fmt::init();
     tracing_subscriber::fmt().with_max_level(Level::INFO).init();
+
     let opts = Opts::parse();
     opts.cmd.execute().await?;
 

@@ -48,7 +48,7 @@ pub fn process_jwt_verify(
     Ok(token_data.claims)
 }
 
-// cargo run jwt sign -i fixtures\b64_plain.txt --aud all -s kindy
+// cargo run jwt sign -i fixtures\b64_plain.txt --aud all -s kindy --exp 15s
 // cargo run jwt verify -i fixtures\jwt_signed_HS256.txt
 
 #[cfg(test)]

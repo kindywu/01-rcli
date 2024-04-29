@@ -1,6 +1,9 @@
+use chrono::Local;
 use clap::Parser;
+use duration_str::parse;
 use enum_dispatch::enum_dispatch;
 use jsonwebtoken::Algorithm;
+use std::ops::Add;
 
 use crate::{process_jwt_sign, process_jwt_verify, read_content, CmdExector};
 
@@ -29,8 +32,8 @@ pub struct JwtSignOpts {
     #[arg(long)]
     pub aud: String,
 
-    #[arg(short, long, default_value_t = 3)]
-    pub exp: u64,
+    #[arg(short, long, default_value = "3s")]
+    pub exp: String,
 
     #[arg(short, long, value_parser = verify_file, default_value = "-")]
     pub input: String,
@@ -53,8 +56,8 @@ impl CmdExector for JwtSignOpts {
         eprintln!("sign {:?}", self);
         let data = read_content(&self.input)?;
         // println!("plain_text is {}", data);
-        let signed =
-            process_jwt_sign(self.algorithm, self.key, self.aud, self.sub, self.exp, data)?;
+        let exp = expiration_timestamp(self.exp) as u64;
+        let signed = process_jwt_sign(self.algorithm, self.key, self.aud, self.sub, exp, data)?;
         println!("{}", signed);
         Ok(())
     }
@@ -68,4 +71,11 @@ impl CmdExector for JwtVerifytOpts {
         println!("{:?}", claims);
         Ok(())
     }
+}
+
+fn expiration_timestamp(exp: String) -> i64 {
+    let duration = parse(exp).unwrap();
+    let now = Local::now();
+    let tomorrow = now.add(duration);
+    tomorrow.timestamp()
 }

@@ -36,7 +36,7 @@ pub enum SubCommand {
     Text(TextSubCommand),
     #[command(subcommand, about = "Sign and Verify text use JWT")]
     Jwt(JwtSubCommand),
-    #[command(subcommand, about = "Sign and Verify text use JWT")]
+    #[command(subcommand, about = "start http server to serve static file")]
     Http(HttpSubCommand),
 }
 
