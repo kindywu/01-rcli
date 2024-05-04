@@ -2,26 +2,39 @@ use std::collections::HashMap;
 
 use anyhow::anyhow;
 use csv::Reader;
+use serde::{Deserialize, Serialize};
 
 use crate::cli::OutputFormat;
 
-// #[allow(dead_code)]
-// #[derive(Debug, Serialize, Deserialize)]
-// #[serde(rename_all = "PascalCase")]
-// struct Player {
-//     name: String,
-//     position: String,
-//     #[serde(rename = "DOB")]
-//     dob: String,
-//     nationality: String,
-//     #[serde(rename = "Kit Number")]
-//     kit: String,
-// }
+#[allow(dead_code)]
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+struct Player {
+    name: String,
+    position: String,
+    #[serde(rename = "DOB")]
+    dob: String,
+    nationality: String,
+    #[serde(rename = "Kit Number")]
+    kit: String,
+}
 
 pub fn process_csv(input: &str, format: &OutputFormat) -> Result<String, anyhow::Error> {
     let mut reader = Reader::from_path(input)?;
     let mut records: Vec<HashMap<String, String>> = Vec::with_capacity(128);
     let header = reader.headers()?.clone();
+
+    // let mut players = Vec::new();
+    // for result in reader.deserialize() {
+    //     // Notice that we need to provide a type hint for automatic
+    //     // deserialization.
+    //     let player: Player = result?;
+    //     players.push(player);
+    // }
+
+    // for player in players {
+    //     println!("player is {:?}", player);
+    // }
 
     // print!("{:?}", format);
     for result in reader.records() {
